@@ -529,7 +529,7 @@ async def social_ponb(callback: types.CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="ПОНБ ВКонтакте", url="https://vk.com/nazbez_urfu")],
         [InlineKeyboardButton(text="ПОНБ в телеграмме", url="https://t.me/nazbez_urfu")],
-        [InlineKeyboardButton(text="ПОНБ в Максе", callback_data="placeholder_max_ponb")],
+        [InlineKeyboardButton(text="Группа НацБез в Максе", callback_data="https://max.ru/join/adpNHskPr0vF47AgBCL7kOnJNneZdsqw1RT2MHLjGnk")],
         [InlineKeyboardButton(text="◀️ Назад", callback_data="block3_links")]
     ])
     # ИСПРАВЛЕНО: была синтаксическая ошибка — строка без запятой перед reply_markup
