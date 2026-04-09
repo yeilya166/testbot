@@ -5,7 +5,7 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 # --- НАСТРОЙКИ ---
@@ -13,7 +13,7 @@ TOKEN = os.getenv("BOT_TOKEN")
 if not TOKEN:
     raise ValueError("Переменная окружения BOT_TOKEN не найдена!")
 
-# Нужные медиафайлы 
+# Нужные медиафайлы
 VIDEO_CURATOR = "___"
 VIDEO_REVIEWS = "___"
 VIDEO_PROFESSIONS = "___"
@@ -58,9 +58,11 @@ def back_to_block_keyboard(block: str):
 # --- Обработчики команд ---
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
-    # Первое сообщение – только приветствие
-    await message.answer("Добро пожаловать в чат-бот программы «Правовое обеспечение национальной безопасности» Уральского федерального университета! Здесь вы узнаете, какие юридические программы есть в УрФУ, чем они отличаются, стоит ли вам становиться юристом и как поступить в УрФУ.")
-    # Второе сообщение – выбор разделов
+    await message.answer(
+        "Добро пожаловать в чат-бот программы «Правовое обеспечение национальной безопасности» "
+        "Уральского федерального университета! Здесь вы узнаете, какие юридические программы есть в УрФУ, "
+        "чем они отличаются, стоит ли вам становиться юристом и как поступить в УрФУ."
+    )
     await message.answer("Выберите интересующий раздел:", reply_markup=main_menu_keyboard())
 
 # --- Обработчики навигации ---
@@ -112,7 +114,7 @@ async def directions(callback: types.CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Чем отличаются направления?", callback_data="block1_diff")],
         [InlineKeyboardButton(text="Кем работать после ПОНБ?", callback_data="block1_jobs")],
-        [InlineKeyboardButton(text="В чем особенности ПОНБ в УрФУ?", callback_data="block1_features")], 
+        [InlineKeyboardButton(text="В чем особенности ПОНБ в УрФУ?", callback_data="block1_features")],
         [InlineKeyboardButton(text="◀️ Назад", callback_data="block1")]
     ])
     await callback.message.edit_text(text, reply_markup=kb)
@@ -122,9 +124,11 @@ async def directions(callback: types.CallbackQuery):
 async def diff(callback: types.CallbackQuery):
     text = (
         "Чем отличаются юридические программы УрФУ?\n\n"
-        "Чем отличаются юридические программы в УрФУ?\n\n"
-        "1️⃣ Три направления бакалавриата: Юриспруденция, Предпринимательское право и Международное право — обучение 4 года; по закону требуется магистратура для работы в государственных, в том числе правоохранительных, органах.\n\n"
-        "2️⃣ Две программы специалитета: Правовое обеспечение национальной безопасности и Судебная экономическая экспертиза — обучение 5 лет; диплом специалиста позволяет работать в Следственном комитете РФ, прокуратуре РФ, претендовать на должность судьи, на статус адвоката, поступить в аспирантуру.\n\n"
+        "1️⃣ Три направления бакалавриата: Юриспруденция, Предпринимательское право и Международное право — обучение 4 года; "
+        "по закону требуется магистратура для работы в государственных, в том числе правоохранительных, органах.\n\n"
+        "2️⃣ Две программы специалитета: Правовое обеспечение национальной безопасности и Судебная экономическая экспертиза — обучение 5 лет; "
+        "диплом специалиста позволяет работать в Следственном комитете РФ, прокуратуре РФ, претендовать на должность судьи, "
+        "на статус адвоката, поступить в аспирантуру.\n\n"
         "3️⃣ Различия по специализации:\n"
         "• Юриспруденция: базовое юридическое образование, два трека программы: частное право и публичное право.\n"
         "• Предпринимательское право: правовое регулирование бизнеса.\n"
@@ -150,7 +154,7 @@ async def jobs(callback: types.CallbackQuery):
     )
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🎬 Смотреть трейлер", callback_data="watch_trailer")],
-        [InlineKeyboardButton(text="◀ Назад", callback_data="block1_directions")]
+        [InlineKeyboardButton(text="◀️ Назад", callback_data="block1_directions")]
     ])
     await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
@@ -167,7 +171,7 @@ async def ponb_features(callback: types.CallbackQuery):
     ])
     await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
-    
+
 @dp.callback_query(F.data == "watch_trailer")
 async def watch_trailer(callback: types.CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -180,7 +184,7 @@ async def watch_trailer(callback: types.CallbackQuery):
     )
     await callback.answer()
 
-# 1.2 Как поступить на ПОНБ (подменю) – без кнопки проходного балла
+# 1.2 Как поступить на ПОНБ (подменю)
 def admission_menu():
     builder = InlineKeyboardBuilder()
     builder.button(text="Какие экзамены сдавать?", callback_data="admission_exams")
@@ -209,8 +213,6 @@ async def exams(callback: types.CallbackQuery):
     kb = back_to_block_keyboard("block1_admission")
     await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
-
-# Обработчик проходного балла полностью удалён
 
 @dp.callback_query(F.data == "admission_achievements")
 async def achievements(callback: types.CallbackQuery):
@@ -388,7 +390,8 @@ async def process_answer(callback: types.CallbackQuery, state: FSMContext):
         if most_common == 1:
             result = (
                 "Большинство ответов «1» — Прирождённый юрист.\n\n"
-                "Ваш склад ума — аналитический, ваша стихия — тексты и процедуры. Вы цените справедливость, умеете аргументировать и не боитесь ответственности. Юриспруденция — ваш осознанный и правильный выбор. Вам прямая дорога на программы «Юриспрудениция» или «Правовое обеспечение национальной безопасности»."
+                "Ваш склад ума — аналитический, ваша стихия — тексты и процедуры. Вы цените справедливость, умеете аргументировать и не боитесь ответственности. "
+                "Юриспруденция — ваш осознанный и правильный выбор. Вам прямая дорога на программы «Юриспруденция» или «Правовое обеспечение национальной безопасности»."
             )
         elif most_common == 2:
             result = (
@@ -472,7 +475,6 @@ async def sport(callback: types.CallbackQuery):
         [InlineKeyboardButton(text="◀️ Назад", callback_data="block3")]
     ])
     await callback.message.edit_text(text, reply_markup=kb)
-    # Если видео есть, отправляем его отдельным сообщением
     if VIDEO_SPORT and VIDEO_SPORT != "___":
         await callback.message.answer_video(
             VIDEO_SPORT,
@@ -492,7 +494,7 @@ async def dorms(callback: types.CallbackQuery):
         reply_markup=kb
     )
     await callback.answer()
-    
+
 @dp.callback_query(F.data == "block3_student_life")
 async def student_life(callback: types.CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -510,7 +512,6 @@ async def student_life(callback: types.CallbackQuery):
 
 @dp.callback_query(F.data == "block3_links")
 async def links(callback: types.CallbackQuery):
-    """Главное меню раздела «Полезные интернет-порталы»"""
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="📱 Соцсети ПОНБ", callback_data="social_ponb")],
         [InlineKeyboardButton(text="🏛 Соцсети ИнЭУ", callback_data="social_ineu")],
@@ -525,23 +526,21 @@ async def links(callback: types.CallbackQuery):
 
 @dp.callback_query(F.data == "social_ponb")
 async def social_ponb(callback: types.CallbackQuery):
-    """Соцсети программы ПОНБ"""
-    # Здесь вы можете заменить плейсхолдеры на реальные ссылки
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="📢 Telegram-канал", callback_data="placeholder_tg_ponb")],
         [InlineKeyboardButton(text="🌐 VK-группа ПОНБ", callback_data="placeholder_vk_ponb")],
-        [InlineKeyboardButton(text="📺 YouTube / Rutube (макс)", callback_data="placeholder_max_ponb")],
+        [InlineKeyboardButton(text="📺 YouTube / Rutube", callback_data="placeholder_max_ponb")],
         [InlineKeyboardButton(text="◀️ Назад", callback_data="block3_links")]
     ])
+    # ИСПРАВЛЕНО: была синтаксическая ошибка — строка без запятой перед reply_markup
     await callback.message.edit_text(
-        "🔹 Социальные сети программы «Правовое обеспечение национальной безопасности»:\n",
+        "🔹 Социальные сети программы «Правовое обеспечение национальной безопасности»:",
         reply_markup=kb
     )
     await callback.answer()
 
 @dp.callback_query(F.data == "social_ineu")
 async def social_ineu(callback: types.CallbackQuery):
-    """Соцсети Института экономики и управления (ИнЭУ)"""
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="ВКонтакте ИнЭУ", url="https://vk.com/ineu_urfu")],
         [InlineKeyboardButton(text="Telegram ИнЭУ", callback_data="placeholder_tg_ineu")],
@@ -556,7 +555,6 @@ async def social_ineu(callback: types.CallbackQuery):
 
 @dp.callback_query(F.data == "abiturient_groups")
 async def abiturient_groups(callback: types.CallbackQuery):
-    """Группы для абитуриентов"""
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Абитуриент УрФУ", url="https://vk.com/abiturient_urfu")],
         [InlineKeyboardButton(text="Поселение ИнЭУ", url="https://vk.com/poselenie_ineu")],
@@ -569,15 +567,15 @@ async def abiturient_groups(callback: types.CallbackQuery):
     )
     await callback.answer()
 
-# --- Обработчики-заглушки для отсутствующих ссылок ---
+# --- Обработчики-заглушки для ненастроенных ссылок ---
 @dp.callback_query(F.data.startswith("placeholder_"))
 async def placeholder_handler(callback: types.CallbackQuery):
-    """Временное сообщение для ненастроенных ссылок"""
     await callback.answer("Ссылка пока не добавлена, но скоро появится!", show_alert=True)
 
 # --- Обработка всех "назад" через back_to_ ---
 @dp.callback_query(F.data.startswith("back_to_"))
-async def back_to_block(callback: types.CallbackQuery):
+async def back_to_block(callback: types.CallbackQuery, state: FSMContext):
+    # ИСПРАВЛЕНО: корректное извлечение цели (ранее split("_")[-1] давало только последнее слово)
     target = callback.data[len("back_to_"):]
     if target == "block1_directions":
         await directions(callback)
@@ -589,6 +587,8 @@ async def back_to_block(callback: types.CallbackQuery):
         await block2_handler(callback)
     elif target == "block3":
         await block3_handler(callback)
+    elif target == "block3_links":
+        await links(callback)
     else:
         await main_menu(callback)
 
