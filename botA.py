@@ -527,8 +527,8 @@ async def links(callback: types.CallbackQuery):
 @dp.callback_query(F.data == "social_ponb")
 async def social_ponb(callback: types.CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="ПОНБ ВКонтакте", callback_data="https://vk.com/nazbez_urfu")],
-        [InlineKeyboardButton(text="ПОНБ в телеграмме", callback_data="https://t.me/nazbez_urfu")],
+        [InlineKeyboardButton(text="ПОНБ ВКонтакте", url="https://vk.com/nazbez_urfu")],
+        [InlineKeyboardButton(text="ПОНБ в телеграмме", url="https://t.me/nazbez_urfu")],
         [InlineKeyboardButton(text="ПОНБ в Максе", callback_data="placeholder_max_ponb")],
         [InlineKeyboardButton(text="◀️ Назад", callback_data="block3_links")]
     ])
@@ -543,7 +543,7 @@ async def social_ponb(callback: types.CallbackQuery):
 async def social_ineu(callback: types.CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="ВКонтакте ИнЭУ", url="https://vk.com/ineu_urfu")],
-        [InlineKeyboardButton(text="Telegram ИнЭУ", callback_data="https://t.me/ineu_urfu")],
+        [InlineKeyboardButton(text="Telegram ИнЭУ", url="https://t.me/ineu_urfu")],
         [InlineKeyboardButton(text="ИнЭУ в Максе", callback_data="placeholder_max_ineu")],
         [InlineKeyboardButton(text="Официальный сайт ИнЭУ", url="https://ineu.urfu.ru/")],
         [InlineKeyboardButton(text="◀️ Назад", callback_data="block3_links")]
@@ -559,7 +559,7 @@ async def abiturient_groups(callback: types.CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Абитуриент УрФУ", url="https://vk.com/abiturient_urfu")],
         [InlineKeyboardButton(text="Поселение ИнЭУ", url="https://vk.com/poselenie_ineu")],
-        [InlineKeyboardButton(text="Хочу в УрФУ", callback_data="https://vk.com/abiturient_urfu")],
+        [InlineKeyboardButton(text="Хочу в УрФУ", url="https://vk.com/abiturient_urfu")],
         [InlineKeyboardButton(text="◀️ Назад", callback_data="block3_links")]
     ])
     await callback.message.edit_text(
