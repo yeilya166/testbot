@@ -150,10 +150,10 @@ async def watch_trailer(callback: types.CallbackQuery):
     # ИЗМЕНЕНО: вместо отправки видео — кнопка-ссылка
     text = (
         "Узнайте, кем уже работают выпускники программы ПОНБ УрФУ — "
-        "в реальных органах власти, правоохранительных структурах и крупных компаниях."
+        "в органах власти, правоохранительных структурах и крупных компаниях."
     )
     kb = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="🎬 Кем работают выпускники?", url="https://ссылка_на_видео_о_работе")],
+    [InlineKeyboardButton(text="🎬 Кем работают выпускники?", url="https://www.youtube.com/watch?v=_NvUNX_tnxI")],
     [InlineKeyboardButton(text="◀️ Назад", callback_data="block1_directions")]
     ])
     await callback.message.edit_text(text, reply_markup=kb)
@@ -224,7 +224,7 @@ async def docs(callback: types.CallbackQuery):
 # ---- БЛОК 2: Выбор профессии ----
 def block2_menu():
     builder = InlineKeyboardBuilder()
-    builder.button(text="🎬 Видео от руководителя программы", url="https://ваша_ссылка_на_видео_руководителя")
+    builder.button(text="🎬 Видео от руководителя программы", url="https://www.youtube.com/watch?v=_NvUNX_tnxI")
     builder.button(text="🎓 Отзывы выпускников об обучении", url="https://rutube.ru/video/e665b4b11ac6630c879b75b45d5a4665")
     builder.button(text="👥 Знакомство с представителями профессий", callback_data="block2_professions")
     builder.button(text="❓ Тест «Тебе подходит профессия юриста?»", callback_data="start_test")
@@ -394,7 +394,7 @@ async def buildings(callback: types.CallbackQuery):
         "Посмотрите видеообзор корпусов, аудиторий и коворкингов:"
     )
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🎬 Смотреть обзор", url="____")],
+        [InlineKeyboardButton(text="🎬 Смотреть обзор", url="https://www.youtube.com/watch?v=_NvUNX_tnxI")],
         [InlineKeyboardButton(text="◀️ Назад", callback_data="block3")]
     ])
     await callback.message.edit_text(text, reply_markup=kb)
