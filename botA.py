@@ -19,7 +19,7 @@ VIDEO_CURATOR = "___"  # ждём
 VIDEO_REVIEWS = FSInputFile("/app/shared/tmp0jqed5j4.mp4")   # отзывы об обучении
 VIDEO_TRAILER = "___"  # КЕМ РАБОТАЮТ ВЫПУСКНИКИ
 VIDEO_CAMPUS  = "___"
-VIDEO_SPORT   = FSInputFile("/app/shared/tmp3wisoc7a.mp4")
+VIDEO_SPORT   = FSInputFile("/app/data/fizra.mp4")
 # --- Логирование ---
 logging.basicConfig(level=logging.INFO)
 # --- Инициализация ---
