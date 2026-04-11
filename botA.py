@@ -18,7 +18,7 @@ VIDEO_CURATOR = "___" # ждём
 VIDEO_REVIEWS = "/app/shared/tmp7mm9rjjm.mp4" #отзывы об обучении
 VIDEO_TRAILER = "___" #КЕМ РАБОТАЮТ ВЫПУСКНИКИ!!! а не отзывы, отзывы - VIDEO_REVIEWS
 VIDEO_CAMPUS = "___"
-VIDEO_SPORT = "/app/shared/tmp3ptu6v9h.mp4"
+VIDEO_SPORT = "/app/videos/fizra.mp4"
 
 # --- Логирование ---
 logging.basicConfig(level=logging.INFO)
@@ -289,9 +289,11 @@ async def reviews_video(callback: types.CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="◀️ Назад", callback_data="block2")]
     ])
-    video_path = "/app/shared/tmp7mm9rjjm.mp4"   # или используйте переменную VIDEO_REVIEWS
-    video_file = FSInputFile(video_path)
-    await callback.message.answer_video(video_file, caption="Отзывы выпускников об обучении", reply_markup=kb)
+    await callback.message.answer_video(
+        VIDEO_REVIEWS,
+        caption="Отзывы выпускников об обучении.",
+        reply_markup=kb
+    )
     await callback.answer()
 
 @dp.callback_query(F.data == "block2_professions")
