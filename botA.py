@@ -14,12 +14,11 @@ if not TOKEN:
     raise ValueError("Переменная окружения BOT_TOKEN не найдена!")
 
 # Нужные медиафайлы
-VIDEO_CURATOR = "___"
-VIDEO_REVIEWS = "___"
-VIDEO_PROFESSIONS = "___"
-VIDEO_TRAILER = "___"
+VIDEO_CURATOR = "___" # ждём
+VIDEO_REVIEWS = "/app/shared/tmp7mm9rjjm.mp4" #отзывы об обучении
+VIDEO_TRAILER = "___" #КЕМ РАБОТАЮТ ВЫПУСКНИКИ!!! а не отзывы, отзывы - VIDEO_REVIEWS
 VIDEO_CAMPUS = "___"
-VIDEO_SPORT = "___"
+VIDEO_SPORT = "/app/shared/tmp3ptu6v9h.mp4"
 
 # --- Логирование ---
 logging.basicConfig(level=logging.INFO)
@@ -55,7 +54,7 @@ def back_to_block_keyboard(block: str):
         [InlineKeyboardButton(text="◀️ Назад", callback_data=f"back_to_{block}")]
     ])
 
-# --- Обработчики команд ---
+##--- Обработчики команд ---
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
     await message.answer(
@@ -92,7 +91,7 @@ async def block1_handler(callback: types.CallbackQuery):
     )
     await callback.answer()
 
-# 1.1 Юридические направления
+## 1.1 Юридические направления
 @dp.callback_query(F.data == "block1_directions")
 async def directions(callback: types.CallbackQuery):
     text = (
@@ -153,7 +152,7 @@ async def jobs(callback: types.CallbackQuery):
         "• Коммерческих структурах"
     )
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🎬 Смотреть трейлер", callback_data="watch_trailer")],
+        [InlineKeyboardButton(text="🎬 Кем работают выпускники?", callback_data="watch_trailer")],
         [InlineKeyboardButton(text="◀️ Назад", callback_data="block1_directions")]
     ])
     await callback.message.edit_text(text, reply_markup=kb)
@@ -179,7 +178,7 @@ async def watch_trailer(callback: types.CallbackQuery):
     ])
     await callback.message.answer_video(
         VIDEO_TRAILER,
-        caption="Короткое видео о будущих профессиях",
+        caption="Кем уже работают выпускники ПОНБ",
         reply_markup=kb
     )
     await callback.answer()
@@ -256,7 +255,7 @@ async def docs(callback: types.CallbackQuery):
 def block2_menu():
     builder = InlineKeyboardBuilder()
     builder.button(text="🎬 Видео от руководителя программы", callback_data="block2_curator")
-    builder.button(text="🎓 Кем работают выпускники", callback_data="block2_reviews")
+    builder.button(text="🎓 Отзывы выпускников об обучении", callback_data="block2_reviews")
     builder.button(text="👥 Знакомство с представителями профессий", callback_data="block2_professions")
     builder.button(text="❓ Тест «Тебе подходит профессия юриста?»", callback_data="start_test")
     builder.button(text="📚 Другие тесты для самоопределения", callback_data="block2_other_tests")
@@ -292,7 +291,7 @@ async def reviews_video(callback: types.CallbackQuery):
     ])
     await callback.message.answer_video(
         VIDEO_REVIEWS,
-        caption="Кем работают выпускники",
+        caption="Отзывы выпускников об учебе.",
         reply_markup=kb
     )
     await callback.answer()
