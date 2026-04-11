@@ -15,10 +15,10 @@ if not TOKEN:
 
 # Нужные медиафайлы
 VIDEO_CURATOR = "___" # ждём
-VIDEO_REVIEWS = "/app/shared/tmp7mm9rjjm.mp4" #отзывы об обучении
+VIDEO_REVIEWS = "/app/shared/review.mp4" #отзывы об обучении
 VIDEO_TRAILER = "___" #КЕМ РАБОТАЮТ ВЫПУСКНИКИ!!! а не отзывы, отзывы - VIDEO_REVIEWS
 VIDEO_CAMPUS = "___"
-VIDEO_SPORT = "/app/shared/tmp3ptu6v9h.mp4"
+VIDEO_SPORT = "/app/shared/fizra.mp4"
 
 # --- Логирование ---
 logging.basicConfig(level=logging.INFO)
