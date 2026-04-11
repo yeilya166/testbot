@@ -7,19 +7,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-# Хранилище ID приветственных сообщений по chat_id
-welcome_messages = {}
 # --- НАСТРОЙКИ ---
 TOKEN = os.getenv("BOT_TOKEN")
 if not TOKEN:
     raise ValueError("Переменная окружения BOT_TOKEN не найдена!")
-# --- Ссылки на видео ---
-# Замените на реальные ссылки, когда они будут готовы
-URL_CURATOR   = "___"   # Видео от руководителя программы
-URL_REVIEWS   = "https://rutube.ru/video/e665b4b11ac6630c879b75b45d5a4665/?r=wd"   # Отзывы выпускников об обучении
-URL_TRAILER   = "___"   # Кем работают выпускники
-URL_CAMPUS    = "___"   # Обзор корпусов
-URL_SPORT     = "https://www.youtube.com/watch?v=nqShwJVr3S8"   # Спортивные объекты
 # --- Логирование ---
 logging.basicConfig(level=logging.INFO)
 # --- Инициализация ---
@@ -51,24 +42,11 @@ def back_to_block_keyboard(block: str):
 # --- Обработчики команд ---
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
-    welcome_msg = await message.answer(
-        "Добро пожаловать в чат-бот программы «Правовое обеспечение национальной безопасности» "
-        "Уральского федерального университета! Здесь вы узнаете, какие юридические программы есть в УрФУ, "
-        "чем они отличаются, стоит ли вам становиться юристом и как поступить в УрФУ."
-    )
-    welcome_messages[message.chat.id] = welcome_msg.message_id
     await message.answer("Выберите интересующий раздел:", reply_markup=main_menu_keyboard())
 # --- Обработчики навигации ---
 @dp.callback_query(F.data == "main_menu")
+@dp.callback_query(F.data == "main_menu")
 async def main_menu(callback: types.CallbackQuery):
-    chat_id = callback.message.chat.id
-    # Удаляем приветственное сообщение, если оно есть
-    if chat_id in welcome_messages:
-        try:
-            await callback.bot.delete_message(chat_id, welcome_messages[chat_id])
-            del welcome_messages[chat_id]
-        except Exception:
-            pass
     await callback.message.delete()
     await callback.message.answer(
         "Выберите интересующий раздел:",
@@ -175,8 +153,8 @@ async def watch_trailer(callback: types.CallbackQuery):
         "в реальных органах власти, правоохранительных структурах и крупных компаниях."
     )
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🎬 Смотреть видео", url=URL_TRAILER)],
-        [InlineKeyboardButton(text="◀️ Назад", callback_data="block1_jobs")]
+    [InlineKeyboardButton(text="🎬 Кем работают выпускники?", url="https://ссылка_на_видео_о_работе")],
+    [InlineKeyboardButton(text="◀️ Назад", callback_data="block1_directions")]
     ])
     await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
@@ -246,8 +224,8 @@ async def docs(callback: types.CallbackQuery):
 # ---- БЛОК 2: Выбор профессии ----
 def block2_menu():
     builder = InlineKeyboardBuilder()
-    builder.button(text="🎬 Видео от руководителя программы", callback_data="block2_curator")
-    builder.button(text="🎓 Отзывы выпускников об обучении", callback_data="block2_reviews")
+    builder.button(text="🎬 Видео от руководителя программы", url="https://ваша_ссылка_на_видео_руководителя")
+    builder.button(text="🎓 Отзывы выпускников об обучении", url="https://rutube.ru/video/e665b4b11ac6630c879b75b45d5a4665")
     builder.button(text="👥 Знакомство с представителями профессий", callback_data="block2_professions")
     builder.button(text="❓ Тест «Тебе подходит профессия юриста?»", callback_data="start_test")
     builder.button(text="📚 Другие тесты для самоопределения", callback_data="block2_other_tests")
@@ -261,32 +239,6 @@ async def block2_handler(callback: types.CallbackQuery):
         "Поможем вам определиться с выбором и познакомиться с профессией.",
         reply_markup=block2_menu()
     )
-    await callback.answer()
-@dp.callback_query(F.data == "block2_curator")
-async def curator_video(callback: types.CallbackQuery):
-    # ИЗМЕНЕНО: вместо отправки видео — кнопка-ссылка
-    text = (
-        "Руководитель программы «Правовое обеспечение национальной безопасности» рассказывает "
-        "об особенностях обучения, перспективах выпускников и уникальных чертах программы в УрФУ."
-    )
-    kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🎬 Смотреть видео", url=URL_CURATOR)],
-        [InlineKeyboardButton(text="◀️ Назад", callback_data="block2")]
-    ])
-    await callback.message.edit_text(text, reply_markup=kb)
-    await callback.answer()
-@dp.callback_query(F.data == "block2_reviews")
-async def reviews_video(callback: types.CallbackQuery):
-    # ИЗМЕНЕНО: вместо отправки видео — кнопка-ссылка
-    text = (
-        "Выпускники программы ПОНБ делятся впечатлениями об обучении, "
-        "рассказывают о студенческой жизни и о том, как учёба помогла им в карьере."
-    )
-    kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🎬 Смотреть отзывы", url=URL_REVIEWS)],
-        [InlineKeyboardButton(text="◀️ Назад", callback_data="block2")]
-    ])
-    await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
 @dp.callback_query(F.data == "block2_professions")
 async def professions_menu(callback: types.CallbackQuery):
@@ -442,7 +394,7 @@ async def buildings(callback: types.CallbackQuery):
         "Посмотрите видеообзор корпусов, аудиторий и коворкингов:"
     )
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🎬 Смотреть обзор", url=URL_CAMPUS)],
+        [InlineKeyboardButton(text="🎬 Смотреть обзор", url="____")],
         [InlineKeyboardButton(text="◀️ Назад", callback_data="block3")]
     ])
     await callback.message.edit_text(text, reply_markup=kb)
@@ -457,7 +409,7 @@ async def sport(callback: types.CallbackQuery):
         "Посмотрите видео о спортивных объектах УрФУ: стадионе, манеже и бассейне."
     )
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🎬 Смотреть видео", url=URL_SPORT)],
+        [InlineKeyboardButton(text="🎬 Смотреть видео", url="https://www.youtube.com/watch?v=nqShwJVr3S8")],
         [InlineKeyboardButton(text="◀️ Назад", callback_data="block3")]
     ])
     await callback.message.edit_text(text, reply_markup=kb)
