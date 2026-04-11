@@ -7,31 +7,28 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-
 # --- НАСТРОЙКИ ---
 TOKEN = os.getenv("BOT_TOKEN")
 if not TOKEN:
     raise ValueError("Переменная окружения BOT_TOKEN не найдена!")
-
 # Нужные медиафайлы
-VIDEO_CURATOR = "___" # ждём
-VIDEO_REVIEWS = "/app/shared/tmp7mm9rjjm.mp4" #отзывы об обучении
-VIDEO_TRAILER = "___" #КЕМ РАБОТАЮТ ВЫПУСКНИКИ!!! а не отзывы, отзывы - VIDEO_REVIEWS
-VIDEO_CAMPUS = "___"
-VIDEO_SPORT = "/app/videos/fizra.mp4"
-
+# FSInputFile используется для локальных файлов на сервере.
+# После первой успешной отправки Telegram вернёт file_id —
+# сохраните его и используйте вместо FSInputFile, чтобы не загружать файл повторно.
+VIDEO_CURATOR = "___"  # ждём
+VIDEO_REVIEWS = FSInputFile("/app/shared/tmp0jqed5j4.mp4")   # отзывы об обучении
+VIDEO_TRAILER = "___"  # КЕМ РАБОТАЮТ ВЫПУСКНИКИ
+VIDEO_CAMPUS  = "___"
+VIDEO_SPORT   = FSInputFile("/app/shared/tmp3wisoc7a.mp4")
 # --- Логирование ---
 logging.basicConfig(level=logging.INFO)
-
 # --- Инициализация ---
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
-
 # --- Состояния для теста ---
 class TestState(StatesGroup):
     waiting_for_answer = State()
     answers = State()
-
 # --- Вспомогательные функции ---
 def main_menu_keyboard():
     """Клавиатура главного меню"""
@@ -41,19 +38,16 @@ def main_menu_keyboard():
     builder.button(text="🎓 Жизнь студента", callback_data="block3")
     builder.adjust(1)
     return builder.as_markup()
-
 def back_to_main_keyboard():
     """Кнопка возврата в главное меню"""
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🏠 Главное меню", callback_data="main_menu")]
     ])
-
 def back_to_block_keyboard(block: str):
     """Кнопка возврата в подменю блока"""
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="◀️ Назад", callback_data=f"back_to_{block}")]
     ])
-
 # --- Обработчики команд ---
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
@@ -63,7 +57,6 @@ async def cmd_start(message: types.Message):
         "чем они отличаются, стоит ли вам становиться юристом и как поступить в УрФУ."
     )
     await message.answer("Выберите интересующий раздел:", reply_markup=main_menu_keyboard())
-
 # --- Обработчики навигации ---
 @dp.callback_query(F.data == "main_menu")
 async def main_menu(callback: types.CallbackQuery):
@@ -72,7 +65,6 @@ async def main_menu(callback: types.CallbackQuery):
         reply_markup=main_menu_keyboard()
     )
     await callback.answer()
-
 # ---- БЛОК 1: Поступление и обучение ----
 def block1_menu():
     builder = InlineKeyboardBuilder()
@@ -81,7 +73,6 @@ def block1_menu():
     builder.button(text="🏠 Главное меню", callback_data="main_menu")
     builder.adjust(1)
     return builder.as_markup()
-
 @dp.callback_query(F.data == "block1")
 async def block1_handler(callback: types.CallbackQuery):
     await callback.message.edit_text(
@@ -90,7 +81,6 @@ async def block1_handler(callback: types.CallbackQuery):
         reply_markup=block1_menu()
     )
     await callback.answer()
-
 # 1.1 Юридические направления
 @dp.callback_query(F.data == "block1_directions")
 async def directions(callback: types.CallbackQuery):
@@ -118,7 +108,6 @@ async def directions(callback: types.CallbackQuery):
     ])
     await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
-
 @dp.callback_query(F.data == "block1_diff")
 async def diff(callback: types.CallbackQuery):
     text = (
@@ -138,7 +127,6 @@ async def diff(callback: types.CallbackQuery):
     kb = back_to_block_keyboard("block1_directions")
     await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
-
 @dp.callback_query(F.data == "block1_jobs")
 async def jobs(callback: types.CallbackQuery):
     text = (
@@ -157,7 +145,6 @@ async def jobs(callback: types.CallbackQuery):
     ])
     await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
-
 @dp.callback_query(F.data == "block1_features")
 async def ponb_features(callback: types.CallbackQuery):
     text = (
@@ -170,7 +157,6 @@ async def ponb_features(callback: types.CallbackQuery):
     ])
     await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
-
 @dp.callback_query(F.data == "watch_trailer")
 async def watch_trailer(callback: types.CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -182,7 +168,6 @@ async def watch_trailer(callback: types.CallbackQuery):
         reply_markup=kb
     )
     await callback.answer()
-
 # 1.2 Как поступить на ПОНБ (подменю)
 def admission_menu():
     builder = InlineKeyboardBuilder()
@@ -192,7 +177,6 @@ def admission_menu():
     builder.button(text="◀️ Назад", callback_data="block1")
     builder.adjust(1)
     return builder.as_markup()
-
 @dp.callback_query(F.data == "block1_admission")
 async def admission_main(callback: types.CallbackQuery):
     await callback.message.edit_text(
@@ -200,7 +184,6 @@ async def admission_main(callback: types.CallbackQuery):
         reply_markup=admission_menu()
     )
     await callback.answer()
-
 @dp.callback_query(F.data == "admission_exams")
 async def exams(callback: types.CallbackQuery):
     text = (
@@ -212,7 +195,6 @@ async def exams(callback: types.CallbackQuery):
     kb = back_to_block_keyboard("block1_admission")
     await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
-
 @dp.callback_query(F.data == "admission_achievements")
 async def achievements(callback: types.CallbackQuery):
     text = (
@@ -229,7 +211,6 @@ async def achievements(callback: types.CallbackQuery):
     kb = back_to_block_keyboard("block1_admission")
     await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
-
 @dp.callback_query(F.data == "admission_docs")
 async def docs(callback: types.CallbackQuery):
     text = (
@@ -250,7 +231,6 @@ async def docs(callback: types.CallbackQuery):
     kb = back_to_block_keyboard("block1_admission")
     await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
-
 # ---- БЛОК 2: Выбор профессии ----
 def block2_menu():
     builder = InlineKeyboardBuilder()
@@ -262,7 +242,6 @@ def block2_menu():
     builder.button(text="🏠 Главное меню", callback_data="main_menu")
     builder.adjust(1)
     return builder.as_markup()
-
 @dp.callback_query(F.data == "block2")
 async def block2_handler(callback: types.CallbackQuery):
     await callback.message.edit_text(
@@ -271,7 +250,6 @@ async def block2_handler(callback: types.CallbackQuery):
         reply_markup=block2_menu()
     )
     await callback.answer()
-
 @dp.callback_query(F.data == "block2_curator")
 async def curator_video(callback: types.CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -283,19 +261,19 @@ async def curator_video(callback: types.CallbackQuery):
         reply_markup=kb
     )
     await callback.answer()
-
 @dp.callback_query(F.data == "block2_reviews")
 async def reviews_video(callback: types.CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="◀️ Назад", callback_data="block2")]
     ])
+    # VIDEO_REVIEWS — FSInputFile: файл загружается с сервера и отправляется в Telegram.
+    # После отправки в логах появится file_id — сохраните его для повторного использования.
     await callback.message.answer_video(
         VIDEO_REVIEWS,
         caption="Отзывы выпускников об обучении.",
         reply_markup=kb
     )
     await callback.answer()
-
 @dp.callback_query(F.data == "block2_professions")
 async def professions_menu(callback: types.CallbackQuery):
     text = (
@@ -304,7 +282,7 @@ async def professions_menu(callback: types.CallbackQuery):
         "Они делятся опытом, отвечают на вопросы — и уже на этом этапе можно договориться о стажировке или стать общественным помощником.\n\n"
         "2️⃣ Со второго семестра первого курса начинается проектное обучение. Лучшим студентам нередко предлагают стажировки и даже трудоустройство 🔥\n\n"
         "3️⃣ Многие преподаватели — практикующие юристы или бывшие сотрудники органов власти. "
-        "К ним можно обратиться за стажировкой или рекомендацией, если вы показываете хорошие результаты и заинтересованность.\n\n"
+        "К ним можно обратиться за стажировкой или рекомендацией, если вы показываете хорошие результаты и за��нтересованность.\n\n"
         "4️⃣ За время обучения предусмотрено 4 вида практики. Первая — после 2 курса. Все практики являются производственными: "
         "студенты проходят их в реальных органах и организациях. На 5 курсе предусмотрена преддипломная практика (6 недель), "
         "которая часто становится стартом для трудоустройства.\n\n"
@@ -318,7 +296,6 @@ async def professions_menu(callback: types.CallbackQuery):
     ])
     await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
-
 @dp.callback_query(F.data == "block2_other_tests")
 async def other_tests(callback: types.CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -331,7 +308,6 @@ async def other_tests(callback: types.CallbackQuery):
         reply_markup=kb
     )
     await callback.answer()
-
 # --- Тест ---
 questions = [
     "1. Как вы обычно решаете спор или конфликт с друзьями/коллегами?\n\n1️⃣ Анализирую ситуацию, ищу справедливое решение, опираясь на факты и договоренности.\n2️⃣ Стараюсь найти компромисс, чтобы все остались довольны.\n3️⃣ Предпочитаю избегать конфликтов и уступаю.\n4️⃣ Отстаиваю свои интересы любой ценой.",
@@ -348,7 +324,6 @@ questions = [
     "12. Как вы принимаете важные решения?\n\n1️⃣ Взвешиваю все «за» и «против», изучаю информацию, советуюсь с экспертами.\n2️⃣ Долго сомневаюсь, но в итоге принимаю решение на основе чувств и фактов.\n3️⃣ Часто полагаюсь на интуицию или совет.\n4️⃣ Обычно я знаю правильный ответ, либо мне так кажется.",
     "13. Как, по вашему мнению, следует поступать с теми, кто систематически нарушает установленные законом порядки?\n\n1️⃣ Применить к нему предусмотренные законом меры, соблюдая процедуры и права человека.\n2️⃣ Делать ставку на неотвратимость и суровость наказания.\n3️⃣ Найти корень проблемы и работать на профилактику.\n4️⃣ Такие антиобщественные индивиды неисправимы, их усыплять надо."
 ]
-
 @dp.callback_query(F.data == "start_test")
 async def start_test(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(TestState.waiting_for_answer)
@@ -358,7 +333,6 @@ async def start_test(callback: types.CallbackQuery, state: FSMContext):
         reply_markup=get_test_keyboard(0)
     )
     await callback.answer()
-
 def get_test_keyboard(question_index: int):
     builder = InlineKeyboardBuilder()
     for i in range(1, 5):
@@ -366,7 +340,6 @@ def get_test_keyboard(question_index: int):
     builder.button(text="❌ Прервать тест", callback_data="cancel_test")
     builder.adjust(4, 1)
     return builder.as_markup()
-
 @dp.callback_query(F.data.startswith("test_answer_"), TestState.waiting_for_answer)
 async def process_answer(callback: types.CallbackQuery, state: FSMContext):
     answer = int(callback.data.split("_")[-1])
@@ -418,13 +391,11 @@ async def process_answer(callback: types.CallbackQuery, state: FSMContext):
         )
         await state.clear()
     await callback.answer()
-
 @dp.callback_query(F.data == "cancel_test")
 async def cancel_test(callback: types.CallbackQuery, state: FSMContext):
     await state.clear()
     await callback.message.edit_text("Тест прерван. Выберите раздел:", reply_markup=main_menu_keyboard())
     await callback.answer()
-
 # ---- БЛОК 3: Студенческая жизнь ----
 def block3_menu():
     builder = InlineKeyboardBuilder()
@@ -436,7 +407,6 @@ def block3_menu():
     builder.button(text="🏠 Главное меню", callback_data="main_menu")
     builder.adjust(1)
     return builder.as_markup()
-
 @dp.callback_query(F.data == "block3")
 async def block3_handler(callback: types.CallbackQuery):
     await callback.message.edit_text(
@@ -445,7 +415,6 @@ async def block3_handler(callback: types.CallbackQuery):
         reply_markup=block3_menu()
     )
     await callback.answer()
-
 @dp.callback_query(F.data == "block3_buildings")
 async def buildings(callback: types.CallbackQuery):
     text = "Основные корпуса для юридических специальностей:\n\n• Ленина 13Б\n• Чапаева 16\n• Чапаева 20\n• Мира 19\n• Мира 28"
@@ -462,7 +431,6 @@ async def buildings(callback: types.CallbackQuery):
         reply_markup=kb_video
     )
     await callback.answer()
-
 @dp.callback_query(F.data == "block3_sport")
 async def sport(callback: types.CallbackQuery):
     text = (
@@ -474,14 +442,14 @@ async def sport(callback: types.CallbackQuery):
         [InlineKeyboardButton(text="◀️ Назад", callback_data="block3")]
     ])
     await callback.message.edit_text(text, reply_markup=kb)
-    if VIDEO_SPORT and VIDEO_SPORT != "___":
-        await callback.message.answer_video(
-            VIDEO_SPORT,
-            caption="Спортивные объекты УрФУ (стадион, манеж, бассейн)",
-            reply_markup=kb
-        )
+    # VIDEO_SPORT — FSInputFile: файл загружается с сервера и отправляется в Telegram.
+    # После отправки в логах появится file_id — сохраните его для повторного использования.
+    await callback.message.answer_video(
+        VIDEO_SPORT,
+        caption="Спортивные объекты УрФУ (стадион, манеж, бассейн)",
+        reply_markup=kb
+    )
     await callback.answer()
-
 @dp.callback_query(F.data == "block3_dorms")
 async def dorms(callback: types.CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -493,7 +461,6 @@ async def dorms(callback: types.CallbackQuery):
         reply_markup=kb
     )
     await callback.answer()
-
 @dp.callback_query(F.data == "block3_student_life")
 async def student_life(callback: types.CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -508,7 +475,6 @@ async def student_life(callback: types.CallbackQuery):
         reply_markup=kb
     )
     await callback.answer()
-
 @dp.callback_query(F.data == "block3_links")
 async def links(callback: types.CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -522,22 +488,20 @@ async def links(callback: types.CallbackQuery):
         reply_markup=kb
     )
     await callback.answer()
-
 @dp.callback_query(F.data == "social_ponb")
 async def social_ponb(callback: types.CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="ПОНБ ВКонтакте", url="https://vk.com/nazbez_urfu")],
-        [InlineKeyboardButton(text="ПОНБ в телеграмме", url="https://t.me/nazbez_urfu")],
-        [InlineKeyboardButton(text="Группа НацБез в Максе", callback_data="https://max.ru/join/adpNHskPr0vF47AgBCL7kOnJNneZdsqw1RT2MHLjGnk")],
-        [InlineKeyboardButton(text="◀️ Назад", callback_data="block3_links")]
+        [InlineKeyboardButton(text="ПОНБ в Телеграме", url="https://t.me/nazbez_urfu")],
+        # ИСПРАВЛЕНО: была ссылка в поле callback_data — заменено на url
+        [InlineKeyboardButton(text="Группа НацБез в Максе", url="https://max.ru/join/adpNHskPr0vF47AgBCL7kOnJNneZdsqw1RT2MHLjGnk")],
+        [InlineKeyboardButton(text="◀️ Назад", callback_data="back_to_block3_links")]
     ])
-    # ИСПРАВЛЕНО: была синтаксическая ошибка — строка без запятой перед reply_markup
     await callback.message.edit_text(
         "🔹 Социальные сети программы «Правовое обеспечение национальной безопасности»:",
         reply_markup=kb
     )
     await callback.answer()
-
 @dp.callback_query(F.data == "social_ineu")
 async def social_ineu(callback: types.CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -545,37 +509,33 @@ async def social_ineu(callback: types.CallbackQuery):
         [InlineKeyboardButton(text="Telegram ИнЭУ", url="https://t.me/ineu_urfu")],
         [InlineKeyboardButton(text="ИнЭУ в Максе", callback_data="placeholder_max_ineu")],
         [InlineKeyboardButton(text="Официальный сайт ИнЭУ", url="https://ineu.urfu.ru/")],
-        [InlineKeyboardButton(text="◀️ Назад", callback_data="block3_links")]
+        [InlineKeyboardButton(text="◀️ Назад", callback_data="back_to_block3_links")]
     ])
     await callback.message.edit_text(
         "🏛 Социальные сети и ресурсы Института экономики и управления:",
         reply_markup=kb
     )
     await callback.answer()
-
 @dp.callback_query(F.data == "abiturient_groups")
 async def abiturient_groups(callback: types.CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Абитуриент УрФУ", url="https://vk.com/abiturient_urfu")],
         [InlineKeyboardButton(text="Поселение ИнЭУ", url="https://vk.com/poselenie_ineu")],
         [InlineKeyboardButton(text="Хочу в УрФУ", url="https://vk.com/abiturient_urfu")],
-        [InlineKeyboardButton(text="◀️ Назад", callback_data="block3_links")]
+        [InlineKeyboardButton(text="◀️ Назад", callback_data="back_to_block3_links")]
     ])
     await callback.message.edit_text(
         "🎓 Полезные сообщества для поступающих:",
         reply_markup=kb
     )
     await callback.answer()
-
 # --- Обработчики-заглушки для ненастроенных ссылок ---
 @dp.callback_query(F.data.startswith("placeholder_"))
 async def placeholder_handler(callback: types.CallbackQuery):
     await callback.answer("Ссылка пока не добавлена, но скоро появится!", show_alert=True)
-
 # --- Обработка всех "назад" через back_to_ ---
 @dp.callback_query(F.data.startswith("back_to_"))
 async def back_to_block(callback: types.CallbackQuery, state: FSMContext):
-    # ИСПРАВЛЕНО: корректное извлечение цели (ранее split("_")[-1] давало только последнее слово)
     target = callback.data[len("back_to_"):]
     if target == "block1_directions":
         await directions(callback)
@@ -591,10 +551,8 @@ async def back_to_block(callback: types.CallbackQuery, state: FSMContext):
         await links(callback)
     else:
         await main_menu(callback)
-
 # --- Запуск бота ---
 async def main():
     await dp.start_polling(bot)
-
 if __name__ == "__main__":
     asyncio.run(main())
