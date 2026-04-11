@@ -5,21 +5,21 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+# Хранилище ID приветственных сообщений по chat_id
+welcome_messages = {}
 # --- НАСТРОЙКИ ---
 TOKEN = os.getenv("BOT_TOKEN")
 if not TOKEN:
     raise ValueError("Переменная окружения BOT_TOKEN не найдена!")
-# Нужные медиафайлы
-# FSInputFile используется для локальных файлов на сервере.
-# После первой успешной отправки Telegram вернёт file_id —
-# сохраните его и используйте вместо FSInputFile, чтобы не загружать файл повторно.
-VIDEO_CURATOR = "___"  # ждём
-VIDEO_REVIEWS = FSInputFile("/app/shared/tmp0jqed5j4.mp4")   # отзывы об обучении
-VIDEO_TRAILER = "___"  # КЕМ РАБОТАЮТ ВЫПУСКНИКИ
-VIDEO_CAMPUS  = "___"
-VIDEO_SPORT   = FSInputFile("/app/data/fizra.mp4")
+# --- Ссылки на видео ---
+# Замените на реальные ссылки, когда они будут готовы
+URL_CURATOR   = "___"   # Видео от руководителя программы
+URL_REVIEWS   = "https://rutube.ru/video/e665b4b11ac6630c879b75b45d5a4665/?r=wd"   # Отзывы выпускников об обучении
+URL_TRAILER   = "___"   # Кем работают выпускники
+URL_CAMPUS    = "___"   # Обзор корпусов
+URL_SPORT     = "https://www.youtube.com/watch?v=nqShwJVr3S8"   # Спортивные объекты
 # --- Логирование ---
 logging.basicConfig(level=logging.INFO)
 # --- Инициализация ---
@@ -51,16 +51,26 @@ def back_to_block_keyboard(block: str):
 # --- Обработчики команд ---
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
-    await message.answer(
+    welcome_msg = await message.answer(
         "Добро пожаловать в чат-бот программы «Правовое обеспечение национальной безопасности» "
         "Уральского федерального университета! Здесь вы узнаете, какие юридические программы есть в УрФУ, "
         "чем они отличаются, стоит ли вам становиться юристом и как поступить в УрФУ."
     )
+    welcome_messages[message.chat.id] = welcome_msg.message_id
     await message.answer("Выберите интересующий раздел:", reply_markup=main_menu_keyboard())
 # --- Обработчики навигации ---
 @dp.callback_query(F.data == "main_menu")
 async def main_menu(callback: types.CallbackQuery):
-    await callback.message.edit_text(
+    chat_id = callback.message.chat.id
+    # Удаляем приветственное сообщение, если оно есть
+    if chat_id in welcome_messages:
+        try:
+            await callback.bot.delete_message(chat_id, welcome_messages[chat_id])
+            del welcome_messages[chat_id]
+        except Exception:
+            pass
+    await callback.message.delete()
+    await callback.message.answer(
         "Выберите интересующий раздел:",
         reply_markup=main_menu_keyboard()
     )
@@ -159,14 +169,16 @@ async def ponb_features(callback: types.CallbackQuery):
     await callback.answer()
 @dp.callback_query(F.data == "watch_trailer")
 async def watch_trailer(callback: types.CallbackQuery):
+    # ИЗМЕНЕНО: вместо отправки видео — кнопка-ссылка
+    text = (
+        "Узнайте, кем уже работают выпускники программы ПОНБ УрФУ — "
+        "в реальных органах власти, правоохранительных структурах и крупных компаниях."
+    )
     kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🎬 Смотреть видео", url=URL_TRAILER)],
         [InlineKeyboardButton(text="◀️ Назад", callback_data="block1_jobs")]
     ])
-    await callback.message.answer_video(
-        VIDEO_TRAILER,
-        caption="Кем уже работают выпускники ПОНБ",
-        reply_markup=kb
-    )
+    await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
 # 1.2 Как поступить на ПОНБ (подменю)
 def admission_menu():
@@ -252,27 +264,29 @@ async def block2_handler(callback: types.CallbackQuery):
     await callback.answer()
 @dp.callback_query(F.data == "block2_curator")
 async def curator_video(callback: types.CallbackQuery):
+    # ИЗМЕНЕНО: вместо отправки видео — кнопка-ссылка
+    text = (
+        "Руководитель программы «Правовое обеспечение национальной безопасности» рассказывает "
+        "об особенностях обучения, перспективах выпускников и уникальных чертах программы в УрФУ."
+    )
     kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🎬 Смотреть видео", url=URL_CURATOR)],
         [InlineKeyboardButton(text="◀️ Назад", callback_data="block2")]
     ])
-    await callback.message.answer_video(
-        VIDEO_CURATOR,
-        caption="Видео от руководителя программы ПОНБ",
-        reply_markup=kb
-    )
+    await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
 @dp.callback_query(F.data == "block2_reviews")
 async def reviews_video(callback: types.CallbackQuery):
+    # ИЗМЕНЕНО: вместо отправки видео — кнопка-ссылка
+    text = (
+        "Выпускники программы ПОНБ делятся впечатлениями об обучении, "
+        "рассказывают о студенческой жизни и о том, как учёба помогла им в карьере."
+    )
     kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🎬 Смотреть отзывы", url=URL_REVIEWS)],
         [InlineKeyboardButton(text="◀️ Назад", callback_data="block2")]
     ])
-    # VIDEO_REVIEWS — FSInputFile: файл загружается с сервера и отправляется в Telegram.
-    # После отправки в логах появится file_id — сохраните его для повторного использования.
-    await callback.message.answer_video(
-        VIDEO_REVIEWS,
-        caption="Отзывы выпускников об обучении.",
-        reply_markup=kb
-    )
+    await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
 @dp.callback_query(F.data == "block2_professions")
 async def professions_menu(callback: types.CallbackQuery):
@@ -282,7 +296,7 @@ async def professions_menu(callback: types.CallbackQuery):
         "Они делятся опытом, отвечают на вопросы — и уже на этом этапе можно договориться о стажировке или стать общественным помощником.\n\n"
         "2️⃣ Со второго семестра первого курса начинается проектное обучение. Лучшим студентам нередко предлагают стажировки и даже трудоустройство 🔥\n\n"
         "3️⃣ Многие преподаватели — практикующие юристы или бывшие сотрудники органов власти. "
-        "К ним можно обратиться за стажировкой или рекомендацией, если вы показываете хорошие результаты и за��нтересованность.\n\n"
+        "К ним можно обратиться за стажировкой или рекомендацией, если вы показываете хорошие результаты и заинтересованность.\n\n"
         "4️⃣ За время обучения предусмотрено 4 вида практики. Первая — после 2 курса. Все практики являются производственными: "
         "студенты проходят их в реальных органах и организациях. На 5 курсе предусмотрена преддипломная практика (6 недель), "
         "которая часто становится стартом для трудоустройства.\n\n"
@@ -317,7 +331,7 @@ questions = [
     "5. Что вы думаете о работе с рисками и ответственностью за чужие судьбы или крупные деньги?\n\n1️⃣ Это серьёзно, но именно такая ответственность делает профессию значимой.\n2️⃣ Это давит, но с опытом, наверное, можно к этому привыкнуть.\n3️⃣ Мне было бы очень тяжело и страшно нести такую ношу.\n4️⃣ Я и за себя не всегда отвечаю, но за дело — запросто.",
     "6. Ваш любимый предмет в школе?\n\n1️⃣ История, обществознание, право — анализ событий и систем.\n2️⃣ Иностранные языки, литература — работа с текстами и смыслами.\n3️⃣ Творческие предметы или естественные науки.\n4️⃣ Перемены между уроками.",
     "7. Насколько вы усидчивы и внимательны к деталям?\n\n1️⃣ Очень. Могу подолгу работать с информацией, замечаю малейшие несоответствия.\n2️⃣ Достаточно, но периодически нуждаюсь в смене деятельности.\n3️⃣ Не очень, мне трудно долго концентрироваться на одном.\n4️⃣ Схватываю все на лету, действую по ситуации.",
-    "8. Как вы относитесь к необходимости постоянно учиться и отслеживать изменения в профессиональной деятельности?\n\n1️⃣ Это естественная и даже интересная часть профессии.\n2️⃣ Это необходимость, к которой можно приспособиться.\n3️⃣ Это звучит утомительно, хочется однажды выучить и работать.\n4️⃣ Надо уметь закон под себя гнуть, пусть в обновлениях кто-то другой роется, а я ответ по факту дам.",
+    "8. Как вы относитесь к необходимости постоянно учиться и отслеживать изменения в профессиональной деятельности?\n\n1️⃣ Это естественная и даже интересная часть профессии.\n2️⃣ Это необходимость, к которой можно п��испособиться.\n3️⃣ Это звучит утомительно, хочется однажды выучить и работать.\n4️⃣ Надо уметь закон под себя гнуть, пусть в обновлениях кто-то другой роется, а я ответ по факту дам.",
     "9. Ваша реакция на несправедливость (в жизни, в кино)?\n\n1️⃣ Я горячо желаю восстановить справедливость законными методами.\n2️⃣ Я переживаю и думаю, как можно было бы всё исправить.\n3️⃣ Я расстраиваюсь, но чувствую, что мало что могу изменить.\n4️⃣ Если это не касается меня, то равнодушие.",
     "10. Что для вас важнее в работе?\n\n1️⃣ Статус, интеллектуальный вызов, влияние, чёткость.\n2️⃣ Стабильность, доход, уважение в обществе.\n3️⃣ Творческая реализация, свободный график, комфортная атмосфера.\n4️⃣ Чувство власти, ощущение важности, идея «избранности, превосходства».",
     "11. Приходилось ли вам замечать логические ошибки или неточности в чужих высказываниях?\n\n1️⃣ Постоянно, я сразу их вижу и мысленно исправляю.\n2️⃣ Довольно часто, особенно если тема мне знакома.\n3️⃣ Иногда, но обычно я слушаю общий смысл.\n4️⃣ Редко, я обычно не вслушиваюсь.",
@@ -417,38 +431,36 @@ async def block3_handler(callback: types.CallbackQuery):
     await callback.answer()
 @dp.callback_query(F.data == "block3_buildings")
 async def buildings(callback: types.CallbackQuery):
-    text = "Основные корпуса для юридических специальностей:\n\n• Ленина 13Б\n• Чапаева 16\n• Чапаева 20\n• Мира 19\n• Мира 28"
+    # ИЗМЕНЕНО: вместо отправки видео — кнопка-ссылка
+    text = (
+        "Основные корпуса для юридических специальностей:\n\n"
+        "• Ленина 13Б\n"
+        "• Чапаева 16\n"
+        "• Чапаева 20\n"
+        "• Мира 19\n"
+        "• Мира 28\n\n"
+        "Посмотрите видеообзор корпусов, аудиторий и коворкингов:"
+    )
     kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🎬 Смотреть обзор", url=URL_CAMPUS)],
         [InlineKeyboardButton(text="◀️ Назад", callback_data="block3")]
     ])
     await callback.message.edit_text(text, reply_markup=kb)
-    kb_video = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="◀️ Назад", callback_data="block3")]
-    ])
-    await callback.message.answer_video(
-        VIDEO_CAMPUS,
-        caption="Обзор корпусов, аудиторий, коворкингов",
-        reply_markup=kb_video
-    )
     await callback.answer()
 @dp.callback_query(F.data == "block3_sport")
 async def sport(callback: types.CallbackQuery):
+    # ИЗМЕНЕНО: вместо отправки видео — кнопка-ссылка
     text = (
         "🏋️ Физкультура в УрФУ — пары, которые обязательны для посещения. Но они совсем не похожи на школьные уроки.\n\n"
         "В первые недели учебы вы сможете сами выбрать, какие виды спорта вас интересуют больше всех. Затем нужно будет расставить приоритеты на каждый выбранный вид спорта. Высокая вероятность, что вы попадете туда, куда хотите больше всего.\n\n"
-        "Волейбол, скалолазание, регби и гандбол — лишь часть того, что вы можете выбрать. Уверены, каждый найдет спорт по душе!"
+        "Волейбол, скалолазание, регби и гандбол — лишь часть того, что вы можете выбрать. Уверены, каждый найдет спорт по душе!\n\n"
+        "Посмотрите видео о спортивных объектах УрФУ: стадионе, манеже и бассейне."
     )
     kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🎬 Смотреть видео", url=URL_SPORT)],
         [InlineKeyboardButton(text="◀️ Назад", callback_data="block3")]
     ])
     await callback.message.edit_text(text, reply_markup=kb)
-    # VIDEO_SPORT — FSInputFile: файл загружается с сервера и отправляется в Telegram.
-    # После отправки в логах появится file_id — сохраните его для повторного использования.
-    await callback.message.answer_video(
-        VIDEO_SPORT,
-        caption="Спортивные объекты УрФУ (стадион, манеж, бассейн)",
-        reply_markup=kb
-    )
     await callback.answer()
 @dp.callback_query(F.data == "block3_dorms")
 async def dorms(callback: types.CallbackQuery):
@@ -493,7 +505,6 @@ async def social_ponb(callback: types.CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="ПОНБ ВКонтакте", url="https://vk.com/nazbez_urfu")],
         [InlineKeyboardButton(text="ПОНБ в Телеграме", url="https://t.me/nazbez_urfu")],
-        # ИСПРАВЛЕНО: была ссылка в поле callback_data — заменено на url
         [InlineKeyboardButton(text="Группа НацБез в Максе", url="https://max.ru/join/adpNHskPr0vF47AgBCL7kOnJNneZdsqw1RT2MHLjGnk")],
         [InlineKeyboardButton(text="◀️ Назад", callback_data="back_to_block3_links")]
     ])
