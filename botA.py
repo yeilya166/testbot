@@ -45,7 +45,6 @@ async def cmd_start(message: types.Message):
     await message.answer("Выберите интересующий раздел:", reply_markup=main_menu_keyboard())
 # --- Обработчики навигации ---
 @dp.callback_query(F.data == "main_menu")
-@dp.callback_query(F.data == "main_menu")
 async def main_menu(callback: types.CallbackQuery):
     await callback.message.delete()
     await callback.message.answer(
@@ -223,15 +222,14 @@ async def docs(callback: types.CallbackQuery):
     await callback.answer()
 # ---- БЛОК 2: Выбор профессии ----
 def block2_menu():
-    builder = InlineKeyboardBuilder()
-    builder.button(text="🎬 Видео от руководителя программы", url="https://www.youtube.com/watch?v=_NvUNX_tnxI")
-    builder.button(text="🎓 Отзывы выпускников об обучении", url="https://rutube.ru/video/e665b4b11ac6630c879b75b45d5a4665")
-    builder.button(text="👥 Знакомство с представителями профессий", callback_data="block2_professions")
-    builder.button(text="❓ Тест «Тебе подходит профессия юриста?»", callback_data="start_test")
-    builder.button(text="📚 Другие тесты для самоопределения", callback_data="block2_other_tests")
-    builder.button(text="🏠 Главное меню", callback_data="main_menu")
-    builder.adjust(1)
-    return builder.as_markup()
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🎬 Видео от руководителя программы", url="https://www.youtube.com/watch?v=_NvUNX_tnxI")],
+        [InlineKeyboardButton(text="🎓 Отзывы выпускников об обучении", url="https://rutube.ru/video/e665b4b11ac6630c879b75b45d5a4665")],
+        [InlineKeyboardButton(text="👥 Знакомство с представителями профессий", callback_data="block2_professions")],
+        [InlineKeyboardButton(text="❓ Тест «Тебе подходит профессия юриста?»", callback_data="start_test")],
+        [InlineKeyboardButton(text="📚 Другие тесты для самоопределения", callback_data="block2_other_tests")],
+        [InlineKeyboardButton(text="🏠 Главное меню", callback_data="main_menu")],
+    ])
 @dp.callback_query(F.data == "block2")
 async def block2_handler(callback: types.CallbackQuery):
     await callback.message.edit_text(
