@@ -7,20 +7,16 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-# --- НАСТРОЙКИ ---
+#Токен бота из окружения
 TOKEN = os.getenv("BOT_TOKEN")
 if not TOKEN:
     raise ValueError("Переменная окружения BOT_TOKEN не найдена!")
-# --- Логирование ---
 logging.basicConfig(level=logging.INFO)
-# --- Инициализация ---
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
-# --- Состояния для теста ---
 class TestState(StatesGroup):
     waiting_for_answer = State()
     answers = State()
-# --- Вспомогательные функции ---
 def main_menu_keyboard():
     """Клавиатура главного меню"""
     builder = InlineKeyboardBuilder()
@@ -39,11 +35,9 @@ def back_to_block_keyboard(block: str):
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="◀️ Назад", callback_data=f"back_to_{block}")]
     ])
-# --- Обработчики команд ---
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
     await message.answer("Выберите интересующий раздел:", reply_markup=main_menu_keyboard())
-# --- Обработчики навигации ---
 @dp.callback_query(F.data == "main_menu")
 async def main_menu(callback: types.CallbackQuery):
     await callback.message.delete()
@@ -52,7 +46,7 @@ async def main_menu(callback: types.CallbackQuery):
         reply_markup=main_menu_keyboard()
     )
     await callback.answer()
-# ---- БЛОК 1: Поступление и обучение ----
+# БЛОК 1: Поступление и обучение 
 def block1_menu():
     builder = InlineKeyboardBuilder()
     builder.button(text="Юридические направления в УрФУ", callback_data="block1_directions")
@@ -146,7 +140,6 @@ async def ponb_features(callback: types.CallbackQuery):
     await callback.answer()
 @dp.callback_query(F.data == "watch_trailer")
 async def watch_trailer(callback: types.CallbackQuery):
-    # ИЗМЕНЕНО: вместо отправки видео — кнопка-ссылка
     text = (
         "Узнайте, кем уже работают выпускники программы ПОНБ УрФУ — "
         "в органах власти, правоохранительных структурах и крупных компаниях."
@@ -157,7 +150,7 @@ async def watch_trailer(callback: types.CallbackQuery):
     ])
     await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
-# 1.2 Как поступить на ПОНБ (подменю)
+# 1.2 Как поступить на ПОНБ
 def admission_menu():
     builder = InlineKeyboardBuilder()
     builder.button(text="Какие экзамены сдавать?", callback_data="admission_exams")
@@ -220,7 +213,7 @@ async def docs(callback: types.CallbackQuery):
     kb = back_to_block_keyboard("block1_admission")
     await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
-# ---- БЛОК 2: Выбор профессии ----
+#БЛОК 2: Выбор профессии
 def block2_menu():
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🎬 Видео от руководителя программы", url="https://www.youtube.com/watch?v=_NvUNX_tnxI")],
@@ -272,7 +265,7 @@ async def other_tests(callback: types.CallbackQuery):
         reply_markup=kb
     )
     await callback.answer()
-# --- Тест ---
+# Профтест 
 questions = [
     "1. Как вы обычно решаете спор или конфликт с друзьями/коллегами?\n\n1️⃣ Анализирую ситуацию, ищу справедливое решение, опираясь на факты и договоренности.\n2️⃣ Стараюсь найти компромисс, чтобы все остались довольны.\n3️⃣ Предпочитаю избегать конфликтов и уступаю.\n4️⃣ Отстаиваю свои интересы любой ценой.",
     "2. Ваше отношение к чтению большого количества сложных текстов (законов, договоров, документов)?\n\n1️⃣ Это интересная интеллектуальная задача, я люблю вникать в детали и нюансы.\n2️⃣ Это необходимая работа, если она ведёт к результату, я готов это делать.\n3️⃣ Это скучно и утомительно, я быстро теряю концентрацию.\n4️⃣ «Чат GPT, перескажи этот текст коротко и понятно, как пятилетнему».",
@@ -360,7 +353,7 @@ async def cancel_test(callback: types.CallbackQuery, state: FSMContext):
     await state.clear()
     await callback.message.edit_text("Тест прерван. Выберите раздел:", reply_markup=main_menu_keyboard())
     await callback.answer()
-# ---- БЛОК 3: Студенческая жизнь ----
+#БЛОК 3: Студенческая жизнь
 def block3_menu():
     builder = InlineKeyboardBuilder()
     builder.button(text="🏛 Корпуса и учебные здания", callback_data="block3_buildings")
@@ -381,7 +374,6 @@ async def block3_handler(callback: types.CallbackQuery):
     await callback.answer()
 @dp.callback_query(F.data == "block3_buildings")
 async def buildings(callback: types.CallbackQuery):
-    # ИЗМЕНЕНО: вместо отправки видео — кнопка-ссылка
     text = (
         "Основные корпуса для юридических специальностей:\n\n"
         "• Ленина 13Б\n"
@@ -399,7 +391,6 @@ async def buildings(callback: types.CallbackQuery):
     await callback.answer()
 @dp.callback_query(F.data == "block3_sport")
 async def sport(callback: types.CallbackQuery):
-    # ИЗМЕНЕНО: вместо отправки видео — кнопка-ссылка
     text = (
         "🏋️ Физкультура в УрФУ — пары, которые обязательны для посещения. Но они совсем не похожи на школьные уроки.\n\n"
         "В первые недели учебы вы сможете сами выбрать, какие виды спорта вас интересуют больше всех. Затем нужно будет расставить приоритеты на каждый выбранный вид спорта. Высокая вероятность, что вы попадете туда, куда хотите больше всего.\n\n"
@@ -490,11 +481,10 @@ async def abiturient_groups(callback: types.CallbackQuery):
         reply_markup=kb
     )
     await callback.answer()
-# --- Обработчики-заглушки для ненастроенных ссылок ---
+#Обработчики-заглушки для ненастроенных ссылок 
 @dp.callback_query(F.data.startswith("placeholder_"))
 async def placeholder_handler(callback: types.CallbackQuery):
     await callback.answer("Ссылка пока не добавлена, но скоро появится!", show_alert=True)
-# --- Обработка всех "назад" через back_to_ ---
 @dp.callback_query(F.data.startswith("back_to_"))
 async def back_to_block(callback: types.CallbackQuery, state: FSMContext):
     target = callback.data[len("back_to_"):]
@@ -512,7 +502,6 @@ async def back_to_block(callback: types.CallbackQuery, state: FSMContext):
         await links(callback)
     else:
         await main_menu(callback)
-# --- Запуск бота ---
 async def main():
     await dp.start_polling(bot)
 if __name__ == "__main__":
