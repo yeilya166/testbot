@@ -142,10 +142,12 @@ async def ponb_features(callback: types.CallbackQuery):
 async def watch_trailer(callback: types.CallbackQuery):
     text = (
         "Узнайте, кем уже работают выпускники программы ПОНБ УрФУ — "
-        "в органах власти, правоохранительных структурах и крупных компаниях."
+        "в органах власти, правоохранительных структурах и крупных компаниях.\n\n"
+        "⚠️ В этом видео мы показываем только примеры. "
+        "Выпускники, работающие в правоохранительных органах, в нём не представлены"
     )
     kb = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="🎬 Кем работают выпускники?", url="https://www.youtube.com/watch?v=_NvUNX_tnxI")],
+    [InlineKeyboardButton(text="🎬 Кем работают выпускники?", url="https://disk.yandex.ru/i/hvbDrhReIyFMzQ")],
     [InlineKeyboardButton(text="◀️ Назад", callback_data="block1_directions")]
     ])
     await callback.message.edit_text(text, reply_markup=kb)
@@ -216,7 +218,7 @@ async def docs(callback: types.CallbackQuery):
 #БЛОК 2: Выбор профессии
 def block2_menu():
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🎬 Видео от руководителя программы", url="https://www.youtube.com/watch?v=_NvUNX_tnxI")],
+        [InlineKeyboardButton(text="🎬 Видео от руководителя программы", url="https://disk.yandex.ru/d/auNvplh3zpeFKg")],
         [InlineKeyboardButton(text="🎓 Отзывы выпускников об обучении", url="https://rutube.ru/video/e665b4b11ac6630c879b75b45d5a4665")],
         [InlineKeyboardButton(text="👥 Знакомство с представителями профессий", callback_data="block2_professions")],
         [InlineKeyboardButton(text="❓ Тест «Тебе подходит профессия юриста?»", callback_data="start_test")],
