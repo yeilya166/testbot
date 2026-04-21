@@ -147,7 +147,7 @@ async def watch_trailer(callback: types.CallbackQuery):
         "Выпускники, работающие в правоохранительных органах, в нём не представлены"
     )
     kb = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="🎬 Кем работают выпускники?", url="https://disk.yandex.ru/i/hvbDrhReIyFMzQ")],
+    [InlineKeyboardButton(text="🎬 Кем работают выпускники?", url="https://vkvideo.ru/video-185929130_456239155?list=ln-A1OERp3zDGcqK9BClG")],
     [InlineKeyboardButton(text="◀️ Назад", callback_data="block1_directions")]
     ])
     await callback.message.edit_text(text, reply_markup=kb)
