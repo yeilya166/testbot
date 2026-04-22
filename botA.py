@@ -218,7 +218,7 @@ async def docs(callback: types.CallbackQuery):
 #БЛОК 2: Выбор профессии
 def block2_menu():
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🎬 Видео от руководителя программы", url="https://disk.yandex.ru/d/auNvplh3zpeFKg")],
+        [InlineKeyboardButton(text="🎬 Видео от руководителя программы", url="https://vkvideo.ru/video-185929130_456239158?t=50s")],
         [InlineKeyboardButton(text="🎓 Отзывы выпускников об обучении", url="https://rutube.ru/video/e665b4b11ac6630c879b75b45d5a4665")],
         [InlineKeyboardButton(text="👥 Знакомство с представителями профессий", callback_data="block2_professions")],
         [InlineKeyboardButton(text="❓ Тест «Тебе подходит профессия юриста?»", callback_data="start_test")],
